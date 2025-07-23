@@ -681,57 +681,57 @@ col1, col2 = st.columns([1, 1])
 with col1:
     if analysis_mode == "Code Analysis":
         st.markdown("### 📝 Code Input")
-    
-    # File upload section
+        
+        # File upload section
         st.markdown("#### 📁 Upload File")
-    uploaded_file = st.file_uploader(
-            "Choose a code file",
-        type=['py', 'js', 'java', 'cpp', 'c', 'cs', 'go', 'rs', 'php', 'rb', 'swift', 'kt', 'txt'],
-            help="Upload code files for AI analysis"
-    )
-    
-    code_from_file = ""
-    if uploaded_file is not None:
-        # Read file content
-        try:
-            code_from_file = str(uploaded_file.read(), "utf-8")
-            file_size = len(code_from_file)
-            file_lines = len(code_from_file.splitlines())
-            
-            st.markdown(f"""
-            <div class="file-info">
-                ✅ <strong>File Uploaded Successfully</strong><br>
-                📄 <strong>Name:</strong> {uploaded_file.name}<br>
-                📏 <strong>Size:</strong> {file_size} bytes<br>
-                📊 <strong>Lines:</strong> {file_lines}<br>
-                🔍 <strong>Status:</strong> Ready for analysis
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Auto-populate the text area
-            st.session_state.code_input = code_from_file
-            
-        except UnicodeDecodeError:
-                st.error("🚨 File encoding error: Please use UTF-8 encoded files")
-        except Exception as e:
-                st.error(f"🚨 File read error: {str(e)}")
-    
-    # Code input with modern styling
-    code_input = st.text_area(
-            "Or paste your code here",
-        value=st.session_state.get('code_input', ''),
-        height=350,
-        key="code_input",
-        help="Paste code directly or upload file above"
-    )
-    
-    # Modern analyze button
-    analyze_button = st.button(
-        "🚀 Analyze Code",
-        type="primary",
-        help="Analyze your code with AI"
-    )
-    
+        uploaded_file = st.file_uploader(
+                "Choose a code file",
+            type=['py', 'js', 'java', 'cpp', 'c', 'cs', 'go', 'rs', 'php', 'rb', 'swift', 'kt', 'txt'],
+                help="Upload code files for AI analysis"
+        )
+        
+        code_from_file = ""
+        if uploaded_file is not None:
+            # Read file content
+            try:
+                code_from_file = str(uploaded_file.read(), "utf-8")
+                file_size = len(code_from_file)
+                file_lines = len(code_from_file.splitlines())
+                
+                st.markdown(f"""
+                <div class="file-info">
+                    ✅ <strong>File Uploaded Successfully</strong><br>
+                    📄 <strong>Name:</strong> {uploaded_file.name}<br>
+                    📏 <strong>Size:</strong> {file_size} bytes<br>
+                    📊 <strong>Lines:</strong> {file_lines}<br>
+                    🔍 <strong>Status:</strong> Ready for analysis
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Auto-populate the text area
+                st.session_state.code_input = code_from_file
+                
+            except UnicodeDecodeError:
+                    st.error("🚨 File encoding error: Please use UTF-8 encoded files")
+            except Exception as e:
+                    st.error(f"🚨 File read error: {str(e)}")
+        
+        # Code input with modern styling
+        code_input = st.text_area(
+                "Or paste your code here",
+            value=st.session_state.get('code_input', ''),
+            height=350,
+            key="code_input",
+            help="Paste code directly or upload file above"
+        )
+        
+        # Modern analyze button
+        analyze_button = st.button(
+            "🚀 Analyze Code",
+            type="primary",
+            help="Analyze your code with AI"
+        )
+        
     else:  # GitHub Repository mode
         st.markdown("### 📦 GitHub Analysis")
         

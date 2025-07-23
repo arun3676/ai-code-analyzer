@@ -3,9 +3,9 @@ services:
     name: llm-code-analyzer
     env: python
     repo: https://github.com/arun3676/ai-code-analyzer.git
-    branch: main
+    branch: master
     buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run app.py --server.port=$PORT --server.address=0.0.0.0
+    startCommand: streamlit run matrix_app.py --server.port=$PORT --server.address=0.0.0.0
     plan: free
     envVars:
       - key: OPENAI_API_KEY

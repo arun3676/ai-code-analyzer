@@ -399,6 +399,13 @@ with st.sidebar:
     # Multi-model analysis toggle
     analyze_all = st.checkbox("🔄 MULTI_NETWORK_SCAN", value=False)
     
+    # Analysis mode selection
+    analysis_mode = st.selectbox(
+        "ANALYSIS_MODE",
+        ["Code Analysis", "GitHub Repository"],
+        format_func=lambda x: f"📝 {x}" if x == "Code Analysis" else f"📦 {x}"
+    )
+    
     # Language selection
     languages = ["auto-detect", "python", "javascript", "java", "cpp", "csharp", "go", "rust"]
     selected_language = st.selectbox(
@@ -451,33 +458,94 @@ console.log(`Reality: ${reality}`);
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    st.markdown("### 📟 CODE_INPUT_TERMINAL")
+    if analysis_mode == "Code Analysis":
+        st.markdown("### 📟 CODE_INPUT_TERMINAL")
+        
+        # Code input with Matrix styling
+        code_input = st.text_area(
+            "PASTE_TARGET_CODE",
+            value=st.session_state.get('code_input', ''),
+            height=400,
+            key="code_input",
+            help="Insert code for neural network analysis..."
+        )
+        
+        # Matrix-styled analyze button
+        analyze_button = st.button(
+            "🚀 INITIATE_SCAN",
+            type="primary",
+            disabled=not code_input.strip(),
+            help="Begin deep neural analysis of target code"
+        )
     
-    # Code input with Matrix styling
-    code_input = st.text_area(
-        "PASTE_TARGET_CODE",
-        value=st.session_state.get('code_input', ''),
-        height=400,
-        key="code_input",
-        help="Insert code for neural network analysis..."
-    )
-    
-    # Matrix-styled analyze button
-    analyze_button = st.button(
-        "🚀 INITIATE_SCAN",
-        type="primary",
-        disabled=not code_input.strip(),
-        help="Begin deep neural analysis of target code"
-    )
+    else:  # GitHub Repository mode
+        st.markdown("### 📦 GITHUB_REPOSITORY_TERMINAL")
+        
+        # GitHub URL input
+        github_url = st.text_input(
+            "TARGET_REPOSITORY_URL",
+            placeholder="https://github.com/owner/repo",
+            help="Enter GitHub repository URL for analysis"
+        )
+        
+        # GitHub analyze button
+        analyze_github_button = st.button(
+            "🔍 SCAN_REPOSITORY",
+            type="primary",
+            disabled=not github_url.strip(),
+            help="Begin neural analysis of GitHub repository"
+        )
+        
+        # Initialize code_input for compatibility
+        code_input = ""
+        analyze_button = False
 
 # Results Terminal
 with col2:
     st.markdown("### 📊 ANALYSIS_OUTPUT_TERMINAL")
     
-    if analyze_button and code_input.strip():
+    if (analyze_button and code_input.strip()) or (analysis_mode == "GitHub Repository" and 'analyze_github_button' in locals() and analyze_github_button and github_url.strip()):
         with st.spinner("🟢 SCANNING... NEURAL_NETWORKS_PROCESSING..."):
-            if analyze_all:
-                # Multi-model analysis
+            if analysis_mode == "GitHub Repository":
+                # GitHub Repository Analysis
+                st.markdown("#### 📦 GITHUB_REPOSITORY_SCAN_INITIATED")
+                
+                if analyze_all:
+                    # Multi-model GitHub analysis
+                    results = {}
+                    for model_key in available_models.keys():
+                        result = analyzer.analyze_github_repo(github_url, model_key)
+                        results[model_key] = result
+                    
+                    # Display comparison metrics for GitHub
+                    comparison = analyzer.compare_analyses(results)
+                    
+                    col_metrics = st.columns(4)
+                    with col_metrics[0]:
+                        st.metric("REPOSITORY", "ANALYZED")
+                    with col_metrics[1]:
+                        st.metric("MODELS_USED", len(results))
+                    with col_metrics[2]:
+                        st.metric("CONSENSUS_SCORE", f"{comparison.get('consensus_score', 0):.1f}")
+                    with col_metrics[3]:
+                        st.metric("SCAN_TIME", f"{comparison['analysis_time']:.1f}s")
+                    
+                    # Create tabs for each neural network
+                    tab_names = [f"🤖 {available_models[key]}" for key in results.keys()]
+                    tabs = st.tabs(tab_names)
+                    
+                    for idx, (model_key, result) in enumerate(results.items()):
+                        with tabs[idx]:
+                            display_matrix_analysis_result(result, available_models[model_key])
+                else:
+                    # Single model GitHub analysis
+                    st.markdown(f"#### 🤖 {available_models[selected_model].upper()}_GITHUB_ANALYSIS")
+                    
+                    result = analyzer.analyze_github_repo(github_url, selected_model)
+                    display_matrix_analysis_result(result, available_models[selected_model])
+                    
+            elif analyze_all:
+                # Multi-model code analysis
                 st.markdown("#### 🔄 MULTI_NETWORK_ANALYSIS_INITIATED")
                 
                 results = analyzer.analyze_with_all_models(
