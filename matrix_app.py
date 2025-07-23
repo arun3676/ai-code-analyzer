@@ -599,19 +599,27 @@ with col2:
                 display_matrix_analysis_result(result, available_models[selected_model])
 
 # Instructions for new users
-if not code_input.strip() and not analyze_button:
+if (analysis_mode == "Code Analysis" and not code_input.strip() and not analyze_button) or (analysis_mode == "GitHub Repository" and 'github_url' not in locals()):
     st.markdown("""
     <div class="matrix-terminal" style="margin: 20px 0;">
         <h3 style="color: #00ff41; text-align: center;">🟢 WELCOME TO THE MATRIX 🟢</h3>
         <p style="color: #00ff41; font-family: 'Share Tech Mono', monospace;">
         > SYSTEM_STATUS: ONLINE<br>
         > NEURAL_NETWORKS: READY<br>
-        > AWAITING_CODE_INPUT...<br><br>
+        > ANALYSIS_MODES: CODE_SCAN • REPOSITORY_SCAN<br>
+        > AWAITING_INPUT...<br><br>
         
         <strong>INITIALIZATION_PROTOCOL:</strong><br>
+        📝 CODE_ANALYSIS_MODE:<br>
         1. PASTE_CODE → Left terminal<br>
         2. SELECT_NEURAL_NETWORK → Control panel<br>
         3. INITIATE_SCAN → Begin analysis<br>
+        4. REVIEW_RESULTS → Right terminal<br><br>
+        
+        📦 GITHUB_REPOSITORY_MODE:<br>
+        1. ENTER_REPOSITORY_URL → Left terminal<br>
+        2. SELECT_NEURAL_NETWORK → Control panel<br>
+        3. SCAN_REPOSITORY → Begin analysis<br>
         4. REVIEW_RESULTS → Right terminal<br><br>
         
         <em>The Matrix has you... but now you have the power to analyze it. 🟢</em>
