@@ -830,17 +830,17 @@ with col2:
                                 st.markdown("#### 🔒 CONSENSUS_SECURITY")
                                 for vuln in comparison['consensus_security']:
                                     st.error(f"🚨 SECURITY_ALERT: {vuln}")
-                
-            else:
-                # Single model analysis
-                st.markdown(f"#### 🤖 {available_models[selected_model].upper()}_ANALYSIS")
-                
-                result = analyzer.analyze_code(
-                    code_input,
-                    selected_model,
-                    selected_language if selected_language != "auto-detect" else None
-                )
-                display_matrix_analysis_result(result, available_models[selected_model])
+                    
+                    else:
+                        # Single model analysis
+                        st.markdown(f"#### 🤖 {available_models[selected_model].upper()}_ANALYSIS")
+                        
+                        result = analyzer.analyze_code(
+                            code_input,
+                            selected_model,
+                            selected_language if selected_language != "auto-detect" else None
+                        )
+                        display_matrix_analysis_result(result, available_models[selected_model])
     
     # GitHub Analysis Results
     else:  # GitHub Repository mode
