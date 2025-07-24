@@ -200,18 +200,24 @@ with st.sidebar:
     
     # Analysis options
     st.subheader("Analysis Options")
-    selected_model = st.selectbox(
-        "Select Model",
-        options=list(available_models.keys()),
-        format_func=lambda x: available_models[x]
-    )
-    
-    analyze_all = st.checkbox("Compare All Models", value=False)
-    
-    # Language selection
-    languages = ["auto-detect", "python", "javascript", "java", "cpp", "csharp", "go", "rust"]
-    selected_language = st.selectbox("Language", languages)
-    
+
+    # This entire block will only render if models are available
+    if available_models:
+        selected_model = st.selectbox(
+            "Select Model",
+            options=list(available_models.keys()),
+            format_func=lambda x: available_models[x]
+        )
+        
+        analyze_all = st.checkbox("Compare All Models", value=False)
+        
+        # Language selection
+        languages = ["auto-detect", "python", "javascript", "java", "cpp", "csharp", "go", "rust"]
+        selected_language = st.selectbox("Language", languages)
+    else:
+        # This message is shown if no models are configured
+        st.warning("No models configured. Please add API keys in your environment variables on Render to enable analysis options.")
+
     st.divider()
     
     # Sample code

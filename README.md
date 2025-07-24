@@ -146,9 +146,9 @@ llm-code-analyzer/
 2. Create a new Web Service on [Render](https://render.com)
 3. Connect your GitHub repository
 4. Configure environment variables in Render dashboard
-5. Deploy with these settings:
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `streamlit run app.py --server.port=$PORT --server.address=0.0.0.0`
+5. Deploy with these settings:  
+   * **Build Command**: `pip install -r requirements.txt`  
+   * **Start Command**: `streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true --server.enableCORS=false`
 
 ### Deploy to Heroku
 
