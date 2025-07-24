@@ -1,11 +1,34 @@
 import streamlit as st
 import os
+import time
 from dotenv import load_dotenv
 from analyzer import CodeAnalyzer
 import json
 
-# Load environment variables
-load_dotenv()
+# Load environment variables - only in development
+if os.path.exists('.env'):
+    load_dotenv()
+
+# Simple health check for Render
+def is_health_check():
+    """Check if this is a health check request"""
+    try:
+        # Check URL parameters
+        if "health" in st.query_params or "healthz" in st.query_params:
+            return True
+        return False
+    except:
+        return False
+
+# Handle health check
+if is_health_check():
+    st.json({
+        "status": "healthy", 
+        "service": "ai-code-analyzer",
+        "timestamp": time.time(),
+        "uptime": "ok"
+    })
+    st.stop()
 
 # Page config
 st.set_page_config(
@@ -58,12 +81,31 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize analyzer
+# Initialize analyzer with better error handling
 @st.cache_resource
 def get_analyzer():
-    return CodeAnalyzer()
+    try:
+        return CodeAnalyzer()
+    except Exception as e:
+        st.error(f"Failed to initialize analyzer: {str(e)}")
+        st.info("Please ensure your API keys are properly configured in the environment variables.")
+        return None
 
 analyzer = get_analyzer()
+
+# Check if analyzer is available
+if analyzer is None:
+    st.error("⚠️ Code Analyzer is not available. Please check your API key configuration.")
+    st.info("""
+    **Required Environment Variables:**
+    - `OPENAI_API_KEY` - For OpenAI GPT-4 analysis
+    - `ANTHROPIC_API_KEY` - For Claude analysis  
+    - `GEMINI_API_KEY` - For Google Gemini analysis
+    - `DEEPSEEK_API_KEY` - For DeepSeek analysis
+    
+    At least one API key is required for the application to work.
+    """)
+    st.stop()
 
 def display_analysis_result(result: dict, model_name: str):
     """Display analysis result in a formatted way."""
