@@ -8,14 +8,14 @@ A professional code analysis tool that leverages multiple Large Language Models 
 
 ## ✨ Features
 
-- **🤖 Multi-Model Analysis**: Compare insights from OpenAI GPT-4, Anthropic Claude, Google Gemini, and DeepSeek
-- **📊 Comprehensive Code Review**: Get quality scores, identify bugs, security issues, and performance concerns
-- **🔍 Language Auto-Detection**: Automatically detects programming language or manually specify
-- **🎨 Clean Professional UI**: Built with Streamlit for a modern, responsive interface
-- **⚡ Lightweight & Fast**: Optimized for deployment on platforms like Render
-- **🔒 Secure**: API keys are securely managed through environment variables
-- **📈 Real-time Metrics**: Track analysis time, quality scores, and model comparisons
-- **🤝 Consensus Analysis**: Identify issues that multiple models agree on
+* **🤖 Multi-Model Analysis**: Compare insights from OpenAI GPT-4, Anthropic Claude, and DeepSeek
+* **📊 Comprehensive Code Review**: Get quality scores, identify bugs, security issues, and performance concerns
+* **🔍 Language Auto-Detection**: Automatically detects programming language or manually specify
+* **🎨 Clean Professional UI**: Built with Streamlit for a modern, responsive interface
+* **⚡ Lightweight & Fast**: Optimized for deployment on platforms like Render
+* **🔒 Secure**: API keys are securely managed through environment variables
+* **📈 Real-time Metrics**: Track analysis time, quality scores, and model comparisons
+* **🤝 Consensus Analysis**: Identify issues that multiple models agree on
 
 ## 🌐 Live Demo
 
@@ -32,12 +32,11 @@ A professional code analysis tool that leverages multiple Large Language Models 
 
 ### Prerequisites
 
-- Python 3.11 or higher
-- API keys for at least one LLM provider:
-  - OpenAI API Key
-  - Anthropic API Key
-  - Google Gemini API Key
-  - DeepSeek API Key
+* Python 3.11 or higher
+* API keys for at least one LLM provider:  
+   * OpenAI API Key  
+   * Anthropic API Key  
+   * DeepSeek API Key
 
 ### Installation
 
@@ -70,7 +69,6 @@ Edit `.env.local` with your actual API keys:
 # API Keys - Replace with your actual API keys
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
-GEMINI_API_KEY=your_google_api_key_here
 DEEPSEEK_API_KEY=your_deepseek_api_key_here
 ```
 
@@ -120,12 +118,11 @@ llm-code-analyzer/
 
 ### Supported LLM Providers
 
-| Provider | Model | API Key Environment Variable |
-|----------|-------|------------------------------|
-| OpenAI | GPT-4o-mini | `OPENAI_API_KEY` |
-| Anthropic | Claude 3 Haiku | `ANTHROPIC_API_KEY` |
-| Google | Gemini Pro | `GEMINI_API_KEY` |
-| DeepSeek | DeepSeek Chat | `DEEPSEEK_API_KEY` |
+| Provider  | Model          | API Key Environment Variable |
+| --------- | -------------- | ---------------------------- |
+| OpenAI    | GPT-4o-mini    | OPENAI\_API\_KEY             |
+| Anthropic | Claude 3 Haiku | ANTHROPIC\_API\_KEY          |
+| DeepSeek  | DeepSeek Chat  | DEEPSEEK\_API\_KEY           |
 
 ### Supported Programming Languages
 
@@ -215,11 +212,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- [Streamlit](https://streamlit.io/) for the amazing framework
-- [OpenAI](https://openai.com/) for GPT models
-- [Anthropic](https://anthropic.com/) for Claude
-- [Google](https://ai.google.dev/) for Gemini
-- [DeepSeek](https://www.deepseek.com/) for DeepSeek Coder
+* Streamlit for the amazing framework
+* OpenAI for GPT models
+* Anthropic for Claude
+* DeepSeek for DeepSeek Coder
 
 ## 📞 Support
 

@@ -100,7 +100,6 @@ if analyzer is None:
     **Required Environment Variables:**
     - `OPENAI_API_KEY` - For OpenAI GPT-4 analysis
     - `ANTHROPIC_API_KEY` - For Claude analysis  
-    - `GEMINI_API_KEY` - For Google Gemini analysis
     - `DEEPSEEK_API_KEY` - For DeepSeek analysis
     
     At least one API key is required for the application to work.

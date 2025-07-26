@@ -32,11 +32,6 @@ class LLMClientManager:
         if os.getenv("ANTHROPIC_API_KEY"):
             self.clients["anthropic"] = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         
-        # Google Gemini
-        if os.getenv("GEMINI_API_KEY"):
-            genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-            self.clients["gemini"] = genai.GenerativeModel('gemini-pro')
-        
         # DeepSeek (uses OpenAI-compatible API)
         if os.getenv("DEEPSEEK_API_KEY"):
             self.clients["deepseek"] = openai.OpenAI(
@@ -51,8 +46,6 @@ class LLMClientManager:
             models["openai"] = "OpenAI GPT-4"
         if "anthropic" in self.clients:
             models["anthropic"] = "Claude 3"
-        if "gemini" in self.clients:
-            models["gemini"] = "Google Gemini"
         if "deepseek" in self.clients:
             models["deepseek"] = "DeepSeek Coder"
         return models
@@ -82,14 +75,6 @@ class LLMClientManager:
                 return LLMResponse(
                     content=response.content[0].text,
                     model="Claude 3 Haiku",
-                    success=True
-                )
-            
-            elif model == "gemini" and "gemini" in self.clients:
-                response = self.clients["gemini"].generate_content(prompt)
-                return LLMResponse(
-                    content=response.text,
-                    model="Google Gemini",
                     success=True
                 )
             
