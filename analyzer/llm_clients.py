@@ -3,7 +3,6 @@ from typing import Optional, Dict, Any
 from dataclasses import dataclass
 import openai
 import anthropic
-import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
