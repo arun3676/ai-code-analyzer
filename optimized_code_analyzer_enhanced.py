@@ -39,6 +39,7 @@ class EnhancedCodeAnalyzer:
         precision: str = "fp16",
         quick_max_new_tokens: int = 180,
         detailed_max_new_tokens: int = 300,
+        remote_api_url: Optional[str] = None,
     ):
         """
         Initialize the enhanced analyzer.
@@ -77,6 +78,7 @@ class EnhancedCodeAnalyzer:
         self.model = None
         self.tokenizer = None
         self.cache = {}
+        self.remote_api_url = remote_api_url
         
         # Create cache directory
         os.makedirs(cache_dir, exist_ok=True)
@@ -345,6 +347,10 @@ Code:
         Returns:
             Dict: Analysis result
         """
+        # Check if using remote model
+        if self.remote_api_url:
+            return self.analyze_code_remote(code, mode)
+        
         # Check cache first
         cached_result = self._check_cache(code)
         if cached_result:
@@ -458,6 +464,51 @@ Code:
             score += 10
         
         return min(score, 100)
+    
+    def analyze_code_remote(self, code: str, mode: str = "quick") -> Dict[str, Any]:
+        """Analyze code using remote Hugging Face API."""
+        import requests
+        
+        if not self.remote_api_url:
+            raise ValueError("No remote API URL configured")
+        
+        cached_result = self._check_cache(code)
+        if cached_result:
+            cached_result["cached"] = True
+            return cached_result
+        
+        start_time = time.time()
+        
+        try:
+            max_tokens = self.quick_max_new_tokens if mode == "quick" else self.detailed_max_new_tokens
+            
+            response = requests.post(
+                f"{self.remote_api_url}/analyze",
+                json={"code": code, "max_tokens": max_tokens},
+                timeout=60
+            )
+            response.raise_for_status()
+            
+            data = response.json()
+            analysis_text = data["analysis"]
+            
+            quality_score = self._calculate_quality_score(analysis_text)
+            total_time = time.time() - start_time
+            
+            result = {
+                "analysis": analysis_text,
+                "quality_score": quality_score,
+                "execution_time": total_time,
+                "model": "fine-tuned-deepseek-remote",
+                "model_type": "deepseek-finetuned-remote",
+                "cached": False
+            }
+            
+            self._save_to_cache(code, result)
+            return result
+            
+        except Exception as e:
+            raise Exception(f"Remote analysis failed: {e}")
     
     def get_model_info(self) -> Dict[str, Any]:
         """Get information about the loaded model."""

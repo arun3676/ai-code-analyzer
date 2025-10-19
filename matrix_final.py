@@ -5,7 +5,7 @@ import random
 import sys
 from dotenv import load_dotenv
 from analyzer import CodeAnalyzer
-from optimized_code_analyzer import OptimizedCodeAnalyzer
+from optimized_code_analyzer_enhanced import EnhancedCodeAnalyzer
 
 # Load environment variables
 load_dotenv()
@@ -281,15 +281,21 @@ def get_analyzer():
 
 analyzer = get_analyzer()
 
-# Local CodeT5+ analyzer (cached)
+# Local analyzer (cached)
 @st.cache_resource
-def get_local_analyzer():
-    return OptimizedCodeAnalyzer(
-        model_id="Salesforce/codet5p-220m",
-        precision="fp16",  # fastest from benchmark
-        quick_max_new_tokens=180,
-        detailed_max_new_tokens=240,
-    )
+def get_local_analyzer(model_type="codet5", remote_url=None):
+    if remote_url:
+        return EnhancedCodeAnalyzer(
+            model_type="deepseek-finetuned-remote",
+            remote_api_url=remote_url
+        )
+    else:
+        return EnhancedCodeAnalyzer(
+            model_type=model_type,
+            precision="fp16",
+            quick_max_new_tokens=180,
+            detailed_max_new_tokens=300,
+        )
 
 def display_matrix_analysis_result(result: dict, model_name: str):
     """Display analysis result in clean, readable horizontal blocks."""
@@ -613,15 +619,51 @@ with st.sidebar:
         format_func=lambda x: f"📝 {x}" if x == "Code Analysis" else f"📦 {x}"
     )
 
-    # Local model toggle and preset
-    use_local = st.checkbox("💻 Use Local CodeT5+ (no external API)", value=False)
-    local_preset = st.selectbox(
-        "Local Inference Mode",
-        ["Quick", "Detailed"],
-        index=0,
-        help="Quick = beams 1, ~180 tokens. Detailed = beams 2, ~240 tokens.",
-        disabled=not use_local,
+    # Model Selection
+    st.markdown("#### 🤖 AI Model Selection")
+    model_choice = st.radio(
+        "Choose Analysis Model:",
+        [
+            "CodeT5+ (Fast - Local)",
+            "Fine-tuned DeepSeek (Accurate - Remote)"
+        ],
+        help="Local models run on your computer, Remote model runs on Hugging Face (always available)"
     )
+    
+    # Remote model configuration
+    remote_api_url = None
+    if "Remote" in model_choice:
+        st.markdown("#### 🌐 Remote Model Configuration")
+        remote_api_url = st.text_input(
+            "Hugging Face Space URL:",
+            value="https://arun3676-fine-tuned-code-analyzer.hf.space",
+            help="Your Hugging Face Space URL"
+        )
+        
+        # Test connection
+        if st.button("🔗 Test Connection"):
+            try:
+                import requests
+                response = requests.get(f"{remote_api_url}/health", timeout=5)
+                if response.status_code == 200:
+                    st.success("✅ Connected to remote model!")
+                else:
+                    st.error("❌ Connection failed")
+            except:
+                st.error("❌ Cannot reach remote model")
+    
+    # Local model toggle and preset (for CodeT5+)
+    if "CodeT5+" in model_choice:
+        use_local = True
+        local_preset = st.selectbox(
+            "Local Inference Mode",
+            ["Quick", "Detailed"],
+            index=0,
+            help="Quick = beams 1, ~180 tokens. Detailed = beams 2, ~240 tokens.",
+        )
+    else:
+        use_local = False
+        local_preset = "Detailed"
     
     if analysis_mode == "GitHub Repository":
         st.markdown("#### Repository Analysis")
@@ -855,10 +897,20 @@ with col2:
                     
                     else:
                         # Single model analysis
-                        if use_local:
-                            st.markdown("#### 🤖 CODET5+_LOCAL_ANALYSIS")
-                            local = get_local_analyzer()
-                            if local_preset == "Quick":
+                        if use_local or "Remote" in model_choice:
+                            # Determine model type and display name
+                            if "Remote" in model_choice:
+                                st.markdown("#### 🤖 FINE-TUNED_DEEPSEEK_REMOTE_ANALYSIS")
+                                model_type = "deepseek-finetuned-remote"
+                                display_name = "Fine-tuned DeepSeek (Remote)"
+                            else:
+                                st.markdown("#### 🤖 CODET5+_LOCAL_ANALYSIS")
+                                model_type = "codet5"
+                                display_name = "CodeT5+ Local"
+                            
+                            local = get_local_analyzer(model_type, remote_api_url)
+                            
+                            if local_preset == "Quick" or "Remote" in model_choice:
                                 result = local.analyze_code_fast(code_input, mode="quick")
                                 # adapt to display format
                                 display_matrix_analysis_result({
@@ -871,10 +923,10 @@ with col2:
                                     "language": "auto",
                                     "line_count": len(code_input.splitlines()),
                                     "raw_response": result["analysis"],
-                                }, "CodeT5+ Local (Quick)")
+                                }, f"{display_name} (Quick)")
                             else:
                                 # streaming path – consume generator and show final
-                                local = get_local_analyzer()
+                                local = get_local_analyzer(model_type, remote_api_url)
                                 final_text = None
                                 for chunk in local.analyze_code_streaming(code_input, show_progress=True, mode="detailed"):
                                     final_text = chunk
@@ -888,7 +940,7 @@ with col2:
                                     "language": "auto",
                                     "line_count": len(code_input.splitlines()),
                                     "raw_response": final_text or "",
-                                }, "CodeT5+ Local (Detailed)")
+                                }, f"{display_name} (Detailed)")
                         else:
                             st.markdown(f"#### 🤖 {available_models[selected_model].upper()}_ANALYSIS")
                             result = analyzer.analyze_code(
