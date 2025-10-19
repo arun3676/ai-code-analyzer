@@ -31,7 +31,7 @@ async def load_model():
     
     model = PeftModel.from_pretrained(
         base_model, 
-        "arun3676/fine-tuned-code-analyzer"
+        "arunn7/fine-tuned-code-analyzer"
     )
     print("✅ Model loaded successfully!")
 
