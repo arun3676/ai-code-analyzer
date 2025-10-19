@@ -41,4 +41,27 @@ test_results.txt
 
 # Deployment
 render.yaml.bak
-netlify.toml.bak 
+netlify.toml.bak
+
+# Model files (too large for GitHub)
+fine-tuned-analyst/
+*.bin
+*.safetensors
+checkpoint-*/
+lora_adapters/
+runs/
+
+# Training data
+additional_samples.json
+mlruns/
+
+# Temporary files
+complete_notebook.py
+create_colab_notebook.py
+create_dataset.py
+generate_full_dataset.py
+test_finetuned_local.py
+
+# Cache directories
+cache/
+.cache/ 

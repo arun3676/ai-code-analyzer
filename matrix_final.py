@@ -5,6 +5,7 @@ import random
 import sys
 from dotenv import load_dotenv
 from analyzer import CodeAnalyzer
+from optimized_code_analyzer import OptimizedCodeAnalyzer
 
 # Load environment variables
 load_dotenv()
@@ -269,7 +270,7 @@ setTimeout(createMatrixRain, 100);
 </script>
 """, unsafe_allow_html=True)
 
-# Initialize analyzer
+# Initialize analyzers
 def get_analyzer():
     # Force reimport to ensure latest code
     import importlib
@@ -279,6 +280,16 @@ def get_analyzer():
     return CodeAnalyzer()
 
 analyzer = get_analyzer()
+
+# Local CodeT5+ analyzer (cached)
+@st.cache_resource
+def get_local_analyzer():
+    return OptimizedCodeAnalyzer(
+        model_id="Salesforce/codet5p-220m",
+        precision="fp16",  # fastest from benchmark
+        quick_max_new_tokens=180,
+        detailed_max_new_tokens=240,
+    )
 
 def display_matrix_analysis_result(result: dict, model_name: str):
     """Display analysis result in clean, readable horizontal blocks."""
@@ -601,6 +612,16 @@ with st.sidebar:
         ["Code Analysis", "GitHub Repository"],
         format_func=lambda x: f"📝 {x}" if x == "Code Analysis" else f"📦 {x}"
     )
+
+    # Local model toggle and preset
+    use_local = st.checkbox("💻 Use Local CodeT5+ (no external API)", value=False)
+    local_preset = st.selectbox(
+        "Local Inference Mode",
+        ["Quick", "Detailed"],
+        index=0,
+        help="Quick = beams 1, ~180 tokens. Detailed = beams 2, ~240 tokens.",
+        disabled=not use_local,
+    )
     
     if analysis_mode == "GitHub Repository":
         st.markdown("#### Repository Analysis")
@@ -621,11 +642,12 @@ with st.sidebar:
     # Analysis options
     st.markdown("#### Analysis Settings")
     
-    # Model selector with modern styling
+    # Model selector with modern styling (disabled when using local)
     selected_model = st.selectbox(
         "Choose AI Model",
         options=list(available_models.keys()),
-        format_func=lambda x: f"🤖 {available_models[x]}"
+        format_func=lambda x: f"🤖 {available_models[x]}",
+        disabled=use_local,
     )
     
     # Multi-model analysis toggle
@@ -833,14 +855,48 @@ with col2:
                     
                     else:
                         # Single model analysis
-                        st.markdown(f"#### 🤖 {available_models[selected_model].upper()}_ANALYSIS")
-                        
-                        result = analyzer.analyze_code(
-                            code_input,
-                            selected_model,
-                            selected_language if selected_language != "auto-detect" else None
-                        )
-                        display_matrix_analysis_result(result, available_models[selected_model])
+                        if use_local:
+                            st.markdown("#### 🤖 CODET5+_LOCAL_ANALYSIS")
+                            local = get_local_analyzer()
+                            if local_preset == "Quick":
+                                result = local.analyze_code_fast(code_input, mode="quick")
+                                # adapt to display format
+                                display_matrix_analysis_result({
+                                    "quality_score": result.get("quality_score", 0),
+                                    "summary": "",
+                                    "bugs": [],
+                                    "quality_issues": [],
+                                    "security_vulnerabilities": [],
+                                    "quick_fixes": [],
+                                    "language": "auto",
+                                    "line_count": len(code_input.splitlines()),
+                                    "raw_response": result["analysis"],
+                                }, "CodeT5+ Local (Quick)")
+                            else:
+                                # streaming path – consume generator and show final
+                                local = get_local_analyzer()
+                                final_text = None
+                                for chunk in local.analyze_code_streaming(code_input, show_progress=True, mode="detailed"):
+                                    final_text = chunk
+                                display_matrix_analysis_result({
+                                    "quality_score": 0,
+                                    "summary": "",
+                                    "bugs": [],
+                                    "quality_issues": [],
+                                    "security_vulnerabilities": [],
+                                    "quick_fixes": [],
+                                    "language": "auto",
+                                    "line_count": len(code_input.splitlines()),
+                                    "raw_response": final_text or "",
+                                }, "CodeT5+ Local (Detailed)")
+                        else:
+                            st.markdown(f"#### 🤖 {available_models[selected_model].upper()}_ANALYSIS")
+                            result = analyzer.analyze_code(
+                                code_input,
+                                selected_model,
+                                selected_language if selected_language != "auto-detect" else None
+                            )
+                            display_matrix_analysis_result(result, available_models[selected_model])
     
     # GitHub Analysis Results
     else:  # GitHub Repository mode

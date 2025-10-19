@@ -1,32 +1,56 @@
-# LLM Code Analyzer
+# AI Code Analyzer
 
-A professional code analysis tool that leverages multiple Large Language Models (LLMs) to provide comprehensive code reviews, identify issues, and suggest improvements.
+A professional AI-powered code analysis tool with a sleek Matrix-inspired interface that leverages multiple Large Language Models (LLMs) to provide comprehensive code reviews, identify issues, and suggest improvements.
 
-![LLM Code Analyzer](https://img.shields.io/badge/Python-3.11+-blue.svg)
+![AI Code Analyzer](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.36.0-red.svg)
+![Deployment](https://img.shields.io/badge/Deployment-Render-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
 ## ✨ Features
 
-* **🤖 Multi-Model Analysis**: Compare insights from OpenAI GPT-4, Anthropic Claude, and DeepSeek
+* **🤖 Multi-Model Analysis**: Compare insights from OpenAI GPT-4, Anthropic Claude, DeepSeek, and fine-tuned models
+* **🎯 Fine-tuned Code Analyzer**: Custom DeepSeek model trained on 59+ code analysis examples
+* **🎨 Matrix-Inspired UI**: Sleek dark theme with neon green accents and cyberpunk aesthetics
 * **📊 Comprehensive Code Review**: Get quality scores, identify bugs, security issues, and performance concerns
 * **🔍 Language Auto-Detection**: Automatically detects programming language or manually specify
-* **🎨 Clean Professional UI**: Built with Streamlit for a modern, responsive interface
-* **⚡ Lightweight & Fast**: Optimized for deployment on platforms like Render
+* **📁 File Upload Support**: Upload code files directly with drag & drop functionality
+* **⚡ Fast & Responsive**: Optimized for deployment with professional performance
 * **🔒 Secure**: API keys are securely managed through environment variables
 * **📈 Real-time Metrics**: Track analysis time, quality scores, and model comparisons
-* **🤝 Consensus Analysis**: Identify issues that multiple models agree on
+* **🌐 Remote Model Support**: Use fine-tuned models hosted on Hugging Face (always available)
 
 ## 🌐 Live Demo
 
-[Try it on Render](https://your-app-name.onrender.com) *(Coming Soon)*
+[🚀 Try it live on Render](https://ai-code-analyzer-tcl8.onrender.com)
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Streamlit
-- **LLM Integration**: OpenAI, Anthropic, Google Gemini, DeepSeek APIs
+- **Frontend**: Streamlit with custom Matrix-inspired CSS
+- **LLM Integration**: OpenAI, Anthropic, DeepSeek APIs
+- **Fine-tuning**: LoRA/QLoRA with Hugging Face Transformers
+- **Model Hosting**: Hugging Face Hub & Spaces
 - **Language**: Python 3.11+
-- **Deployment**: Render (or any Python hosting platform)
+- **Deployment**: Render (configured with render.yaml)
+- **Styling**: Custom CSS with Google Fonts (Share Tech Mono, Orbitron)
+
+## 🎯 Fine-tuned Model
+
+This project includes a custom fine-tuned DeepSeek Coder model trained on 59+ code analysis examples:
+
+- **Base Model**: DeepSeek Coder 1.3B
+- **Training Method**: LoRA (Low-Rank Adaptation)
+- **Dataset**: 59 high-quality code analysis examples
+- **Features**: Quality scores, structured analysis, code improvements
+- **Hosting**: Hugging Face Spaces (always online)
+
+### Model Capabilities
+
+The fine-tuned model provides:
+- **Quality Scores**: 1-100 rating for code quality
+- **Structured Analysis**: Bugs, Performance, Security sections
+- **Code Improvements**: Specific suggestions with examples
+- **Professional Output**: Consistent, detailed analysis format
 
 ## 🚀 Quick Start
 
@@ -42,8 +66,8 @@ A professional code analysis tool that leverages multiple Large Language Models 
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/yourusername/llm-code-analyzer.git
-cd llm-code-analyzer
+git clone https://github.com/arun3676/ai-code-analyzer.git
+cd ai-code-analyzer
 ```
 
 2. **Create a virtual environment:**
@@ -59,59 +83,60 @@ pip install -r requirements.txt
 
 4. **Configure environment variables:**
    
-   Copy the `.env` file and add your API keys:
-```bash
-cp .env .env.local
-```
-
-Edit `.env.local` with your actual API keys:
+   Create a `.env` file in the root directory:
 ```env
 # API Keys - Replace with your actual API keys
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 DEEPSEEK_API_KEY=your_deepseek_api_key_here
+GITHUB_TOKEN=your_github_token_here  # Optional, for higher API limits
 ```
 
 5. **Run the application:**
 ```bash
-streamlit run app.py
+python -m streamlit run matrix_final.py --server.port 8501
 ```
 
 The application will be available at `http://localhost:8501`
 
 ## 📋 Usage
 
-### Single Model Analysis
-1. Paste your code in the left panel
-2. Select a specific LLM model from the dropdown
-3. Choose the programming language (or use auto-detect)
-4. Click "🚀 Analyze Code"
+### Code Analysis
+1. **Upload a file** or **paste your code** in the main panel
+2. **Select a model** from the dropdown (OpenAI, Anthropic, or DeepSeek)
+3. **Choose analysis type**: Code Analysis or Multimodal Analysis
+4. **Click "Analyze Code"** to get comprehensive insights
 
-### Multi-Model Comparison
-1. Paste your code in the left panel
-2. Check "Compare All Models"
-3. Click "🚀 Analyze Code"
-4. View results in separate tabs for each model
-5. See consensus issues identified by multiple models
+### File Upload
+- **Drag & drop** code files directly onto the upload area
+- **Supported formats**: .py, .js, .java, .cpp, .c, .cs, .go, .rs, .php, .rb, .swift, .kt, .txt
+- **File size limit**: 200MB per file
 
-### Sample Code
-Use the "Sample Code" section in the sidebar to quickly load example Python or JavaScript code for testing.
+### Analysis Results
+- **Quality Score**: 0-100 rating with color-coded indicators
+- **Summary**: Clear description of code functionality
+- **Issues & Bugs**: Potential problems identified
+- **Improvements**: Actionable suggestions for better code
+- **Security**: Security vulnerabilities and concerns
+- **Performance**: Optimization recommendations
 
 ## 🏗️ Project Structure
 
 ```
-llm-code-analyzer/
-├── .env                    # Environment variables template
-├── .gitignore             # Git ignore patterns
+ai-code-analyzer/
+├── matrix_final.py        # Main Streamlit application (deployed version)
+├── analyzer/              # Core analysis engine
+│   ├── __init__.py       # Package initialization
+│   ├── code_analyzer.py  # Main analysis engine
+│   ├── llm_clients.py    # LLM API client implementations
+│   ├── prompts.py        # Analysis prompt templates
+│   └── utils.py          # Utility functions
 ├── requirements.txt       # Python dependencies
-├── README.md             # This file
-├── app.py                # Main Streamlit application
-└── analyzer/
-    ├── __init__.py       # Package initialization
-    ├── llm_clients.py    # LLM API client implementations
-    ├── code_analyzer.py  # Main analysis engine
-    ├── prompts.py        # Analysis prompt templates
-    └── utils.py          # Utility functions
+├── render.yaml           # Render deployment configuration
+├── Procfile             # Alternative deployment configuration
+├── runtime.txt          # Python version specification
+├── README.md            # This file
+└── .env                 # Environment variables (create this)
 ```
 
 ## 🔧 Configuration
@@ -126,77 +151,70 @@ llm-code-analyzer/
 
 ### Supported Programming Languages
 
-- Python
-- JavaScript
-- Java
-- C++
-- C#
-- Go
-- Rust
-- And more (auto-detection available)
+- Python, JavaScript, Java, C++, C#, Go, Rust, PHP, Ruby, Swift, Kotlin
+- **Auto-detection** available for most languages
+- **Manual selection** option for specific analysis
 
 ## 🚀 Deployment
 
-### Deploy to Render
+### Deploy to Render (Recommended)
 
-1. Fork this repository
-2. Create a new Web Service on [Render](https://render.com)
-3. Connect your GitHub repository
-4. Configure environment variables in Render dashboard
-5. Deploy with these settings:  
-   * **Build Command**: `pip install -r requirements.txt`  
-   * **Start Command**: `streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true --server.enableCORS=false`
+The project is configured for **one-click deployment** on Render:
 
-### Deploy to Heroku
+1. **Fork this repository** to your GitHub account
+2. **Connect to Render**: Go to [Render Dashboard](https://dashboard.render.com)
+3. **Create New Web Service**: Select "Build and deploy from a Git repository"
+4. **Connect Repository**: Link your forked repository
+5. **Configure Environment Variables** in Render dashboard:
+   - `OPENAI_API_KEY`
+   - `ANTHROPIC_API_KEY` 
+   - `DEEPSEEK_API_KEY`
+   - `GITHUB_TOKEN` (optional)
+6. **Deploy**: Render automatically detects `render.yaml` and deploys
 
-1. Install the Heroku CLI
-2. Create a `Procfile`:
-```
-web: streamlit run app.py --server.port=$PORT --server.address=0.0.0.0
-```
-3. Deploy:
-```bash
-heroku create your-app-name
-heroku config:set OPENAI_API_KEY=your_key_here
-heroku config:set ANTHROPIC_API_KEY=your_key_here
-# ... add other API keys
-git push heroku main
-```
+### Manual Deployment
 
-### Deploy to Railway
-
-1. Connect your GitHub repository to Railway
-2. Set environment variables in Railway dashboard
-3. Deploy automatically on push
-
-## 🧪 Development
-
-### Running Tests
-```bash
-python -m pytest tests/
-```
-
-### Code Formatting
-```bash
-black analyzer/ app.py
-```
-
-### Type Checking
-```bash
-mypy analyzer/
-```
+If deploying manually, use these settings:
+- **Build Command**: `pip install -r requirements.txt`
+- **Start Command**: `streamlit run matrix_final.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true --server.enableCORS=false`
 
 ## 📊 Analysis Output
 
 The tool provides structured analysis including:
 
-- **Quality Score**: 0-100 rating of code quality
-- **Summary**: Brief description of the code's purpose
-- **Strengths**: What the code does well
-- **Issues**: Potential bugs and problems
-- **Suggestions**: Specific improvement recommendations
-- **Security Concerns**: Potential security vulnerabilities
-- **Performance Notes**: Performance optimization opportunities
+- **🎯 Quality Score**: 0-100 rating with visual indicators
+- **📋 Summary**: Clear description of code functionality  
+- **🐛 Issues**: Potential bugs and logical errors
+- **💡 Improvements**: Specific actionable suggestions
+- **🛡️ Security**: Security vulnerabilities and concerns
+- **⚡ Performance**: Optimization opportunities
+- **📈 Metrics**: Analysis time, model used, code statistics
+
+## 🎨 UI Features
+
+- **Matrix Theme**: Dark background with neon green accents
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **File Upload**: Drag & drop interface with progress indicators
+- **Real-time Analysis**: Live progress updates during analysis
+- **Professional Layout**: Clean, organized interface
+- **Custom Fonts**: Share Tech Mono and Orbitron for cyberpunk feel
+
+## 🧪 Development
+
+### Running Locally
+```bash
+# Start the development server
+python -m streamlit run matrix_final.py --server.port 8501
+
+# With auto-reload for development
+python -m streamlit run matrix_final.py --server.port 8501 --server.runOnSave true
+```
+
+### Code Structure
+- **`matrix_final.py`**: Main Streamlit application with UI and routing
+- **`analyzer/`**: Core analysis engine and LLM integrations
+- **Custom CSS**: Embedded in the main app for Matrix theme
+- **Error Handling**: Comprehensive error handling and user feedback
 
 ## 🤝 Contributing
 
@@ -212,19 +230,27 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-* Streamlit for the amazing framework
-* OpenAI for GPT models
-* Anthropic for Claude
-* DeepSeek for DeepSeek Coder
+* **Streamlit** for the amazing framework
+* **OpenAI** for GPT models
+* **Anthropic** for Claude
+* **DeepSeek** for DeepSeek Coder
+* **Render** for seamless deployment
+* **Google Fonts** for Share Tech Mono and Orbitron fonts
 
 ## 📞 Support
 
 If you encounter any issues or have questions:
 
-1. Check the [Issues](https://github.com/yourusername/llm-code-analyzer/issues) page
+1. Check the [Issues](https://github.com/arun3676/ai-code-analyzer/issues) page
 2. Create a new issue with detailed information
 3. Contact the maintainers
 
+## 🔗 Links
+
+- **Live Demo**: [ai-code-analyzer-tcl8.onrender.com](https://ai-code-analyzer-tcl8.onrender.com)
+- **Repository**: [github.com/arun3676/ai-code-analyzer](https://github.com/arun3676/ai-code-analyzer)
+- **Render Dashboard**: [dashboard.render.com](https://dashboard.render.com)
+
 ---
 
-**Built with ❤️ by [Your Name](https://github.com/yourusername)** 
+**Built with ❤️ by [Arun](https://github.com/arun3676)**
