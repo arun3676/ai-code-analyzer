@@ -14,14 +14,12 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Force rebuild from this point - Fix permission error (2025-10-25)
+# Copy application code (matrix_final.py uses /tmp for cache - no permission issues)
 COPY analyzer/ ./analyzer/
 COPY matrix_final.py .
 COPY run_app.py .
 COPY evaluation_samples/ ./evaluation_samples/
-
-# Create cache directory
-RUN mkdir -p /app/.cache
 
 # Expose HuggingFace Spaces default port
 EXPOSE 7860
