@@ -1,0 +1,84 @@
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Testing
+tests/
+test_*.py
+.pytest_cache/
+.coverage
+.tox/
+.nox/
+htmlcov/
+.hypothesis/
+
+# Documentation
+*.md
+!README.md
+ARCHITECTURE.md
+PROJECT_STRUCTURE.md
+TESTING_GUIDE.md
+HUGGINGFACE_SETUP_GUIDE.md
+MERCURY_API_SETUP.md
+*.txt
+!requirements.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Deployment plans
+*.plan.md
+
+# Setup and test scripts
+setup_huggingface.py
+test_api_connections.py
+test_huggingface_setup.py
+
+# Cache
+.cache/
+*.cache
+

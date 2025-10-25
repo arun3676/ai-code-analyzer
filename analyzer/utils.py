@@ -1,29 +1,135 @@
 import re
 from typing import Dict, Any, Tuple
+from pygments.lexers import guess_lexer
+from pygments.util import ClassNotFound
+from .llm_clients import LLMClientManager
+
+def detect_language_with_llm(code: str) -> str:
+    """Detect the programming language of a code snippet using an LLM."""
+    try:
+        llm_manager = LLMClientManager()
+        # Prioritize Hugging Face for this task if available
+        model = "huggingface" if "huggingface" in llm_manager.get_available_models() else list(llm_manager.get_available_models().keys())[0]
+        prompt = f"""
+        Analyze the following code snippet and identify its programming language. 
+        Respond with only the language name (e.g., 'python', 'java', 'javascript', 'go', 'cpp', 'rust', 'php', 'ruby', 'swift', 'kotlin', 'csharp', 'c').
+        If you are unsure, respond with 'unknown'.
+
+        Code:
+        ```
+        {code}
+        ```
+
+        Language:
+        """
+        response = llm_manager.query(model, prompt, temperature=0.1)
+        if response.success:
+            detected_language = response.content.strip().lower()
+            if detected_language and detected_language != "unknown":
+                return detected_language
+    except Exception as e:
+        print(f"LLM-based language detection failed: {e}")
+    return "unknown"
 
 def detect_language(code: str) -> str:
-    """Simple language detection based on syntax patterns."""
-    patterns = {
-        'python': [r'def\s+\w+\(', r'import\s+\w+', r'if\s+__name__\s*==\s*["\']__main__["\']'],
-        'javascript': [r'function\s+\w+\(', r'const\s+\w+\s*=', r'console\.log\('],
-        'java': [r'public\s+class\s+\w+', r'public\s+static\s+void\s+main'],
-        'cpp': [r'#include\s*<\w+>', r'int\s+main\s*\(', r'std::'],
-        'csharp': [r'using\s+System', r'namespace\s+\w+', r'public\s+class\s+\w+'],
-        'go': [r'package\s+\w+', r'func\s+\w+\(', r'import\s+\('],
-        'rust': [r'fn\s+main\s*\(', r'use\s+\w+', r'let\s+mut\s+\w+'],
-    }
+    """Detect the programming language using LLM first for accurate detection, then fallback to pattern matching."""
+    # Try LLM-based detection first for accurate results
+    detected = detect_language_with_llm(code)
+    if detected != "unknown":
+        return detected
     
-    for lang, patterns_list in patterns.items():
-        for pattern in patterns_list:
-            if re.search(pattern, code):
-                return lang
+    # Fallback to pattern matching only if LLM fails
+    code_lower = code.lower()
     
-    return 'unknown'
+    # HTML detection (check first as it's very common and specific)
+    if re.search(r'<html|<head|<body|<div|<span|<p\s|class\s*=|id\s*=', code, re.IGNORECASE):
+        return "html"
+    
+    # CSS detection (check early as it's specific)
+    if re.search(r'\.\w+\s*\{|@media|@import|background:|color:|font-|margin:|padding:', code, re.IGNORECASE):
+        return "css"
+    
+    # Go language detection (check early as it's most specific)
+    if re.search(r'package\s+main|func\s+\w+\s*\(|import\s*\(', code, re.IGNORECASE):
+        return "go"
+    
+    # Python language detection
+    if re.search(r'def\s+\w+\s*\(|import\s+\w+|from\s+\w+\s+import|if\s+__name__\s*==\s*["\']__main__["\']', code, re.IGNORECASE):
+        return "python"
+    
+    # JavaScript language detection (more specific patterns)
+    js_patterns = [
+        r'function\s+\w+\s*\([^)]*\)\s*\{',  # function declaration with body
+        r'const\s+\w+\s*=\s*\([^)]*\)\s*=>',  # arrow function
+        r'let\s+\w+\s*=\s*\([^)]*\)\s*=>',    # arrow function with let
+        r'var\s+\w+\s*=\s*\([^)]*\)\s*=>',    # arrow function with var
+        r'console\.log\s*\(',                  # console.log
+        r'document\.getElementById',           # DOM manipulation
+        r'addEventListener\s*\(',              # event listeners
+        r'require\s*\(|import\s+.*\s+from',    # module imports
+        r'export\s+(default\s+)?(function|const|class)',  # exports
+    ]
+    
+    # TypeScript detection (check before JavaScript)
+    if re.search(r'interface\s+\w+|type\s+\w+\s*=|:\s*\w+\[\]|:\s*string\s*[;=]|:\s*number\s*[;=]', code, re.IGNORECASE):
+        return "typescript"
+    
+    # If it matches JavaScript patterns
+    for pattern in js_patterns:
+        if re.search(pattern, code, re.IGNORECASE):
+            return "javascript"
+    
+    # Java language detection
+    if re.search(r'public\s+class\s+\w+|System\.out\.println|import\s+java\.', code, re.IGNORECASE):
+        return "java"
+    
+    # C++ language detection
+    if re.search(r'#include\s*<|std::|using\s+namespace\s+std', code, re.IGNORECASE):
+        return "cpp"
+    
+    # C language detection
+    if re.search(r'#include\s*<|int\s+main\s*\(|printf\s*\(', code, re.IGNORECASE):
+        return "c"
+    
+    # C# language detection
+    if re.search(r'using\s+System|namespace\s+\w+|public\s+class\s+\w+', code, re.IGNORECASE):
+        return "csharp"
+    
+    # Rust language detection
+    if re.search(r'fn\s+\w+\s*\(|let\s+\w+\s*:|use\s+\w+::', code, re.IGNORECASE):
+        return "rust"
+    
+    # PHP language detection
+    if re.search(r'<\?php|echo\s+|\$\w+\s*=', code, re.IGNORECASE):
+        return "php"
+    
+    # Ruby language detection
+    if re.search(r'def\s+\w+\s*|puts\s+|require\s+', code, re.IGNORECASE):
+        return "ruby"
+    
+    # Swift language detection
+    if re.search(r'func\s+\w+\s*\(|let\s+\w+\s*:|var\s+\w+\s*:', code, re.IGNORECASE):
+        return "swift"
+    
+    # Kotlin language detection
+    if re.search(r'fun\s+\w+\s*\(|val\s+\w+\s*=|var\s+\w+\s*=', code, re.IGNORECASE):
+        return "kotlin"
+    
+    # Fallback to Pygments if no pattern matches
+    try:
+        from pygments.lexers import guess_lexer
+        from pygments.util import ClassNotFound
+        lexer = guess_lexer(code)
+        return lexer.name.lower()
+    except (ClassNotFound, ImportError):
+        return "unknown"
+    return "unknown"
 
-def parse_analysis_result(text: str) -> Dict[str, Any]:
+def parse_analysis_result(text: str, model: str = None) -> Dict[str, Any]:
     """Parse LLM response into structured format with new focused categories."""
     result = {
         'quality_score': 75,  # default
+        'detected_language': None,  # AI-detected language
         'summary': '',
         'bugs': [],
         'quality_issues': [],
@@ -36,6 +142,23 @@ def parse_analysis_result(text: str) -> Dict[str, Any]:
         'security_concerns': [],
         'performance_notes': []
     }
+    
+    # Extract detected language first
+    language_patterns = [
+        r'(?:DETECTED_LANGUAGE|language)[:\s]*([a-z]+)(?:\s|$|\.|,)',
+        r'^language[:\s]*([a-z]+)(?:\s|$|\.|,)',
+        r'(?:programming\s+language)[:\s]*([a-z]+)(?:\s|$|\.|,)',
+    ]
+    
+    for pattern in language_patterns:
+        lang_match = re.search(pattern, text, re.IGNORECASE)
+        if lang_match:
+            detected_lang = lang_match.group(1).strip().lower()
+            # Validate it's a known language
+            known_languages = ['python', 'javascript', 'java', 'cpp', 'c', 'rust', 'go', 'php', 'ruby', 'swift', 'kotlin', 'typescript', 'csharp', 'html', 'css']
+            if detected_lang in known_languages:
+                result['detected_language'] = detected_lang
+                break
     
     # Extract quality score
     score_patterns = [

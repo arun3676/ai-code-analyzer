@@ -1,14 +1,16 @@
-def get_code_analysis_prompt(code: str, language: str = "auto-detect") -> str:
+def get_code_analysis_prompt(code: str, language: str = "auto-detect", model: str = None) -> str:
     """Generate a focused prompt for practical code analysis."""
     return f"""
-You are an expert code reviewer. Analyze this {language} code for practical issues that matter to developers.
+You are an expert code reviewer. Analyze this code and provide comprehensive feedback.
 
 Code to analyze:
 {code}
 
-Provide a focused analysis with complete, readable sentences. Do NOT use markdown symbols like ### or ** in your response.
+First, identify the programming language, then analyze the code. Provide a focused analysis with complete, readable sentences. Do NOT use markdown symbols like ### or ** in your response.
 
-1. QUALITY_SCORE: Rate 0-100 (consider bugs, readability, maintainability)
+0. DETECTED_LANGUAGE: Respond with ONLY the programming language name (e.g., python, javascript, rust, cpp, java, go, php, ruby, swift, kotlin, typescript, csharp, html, css). Make sure to detect the language accurately based on the actual code.
+
+1. QUALITY_SCORE: Rate 0-100 (consider bugs, readability, maintainability). Respond with ONLY the number.
 
 2. SUMMARY: One complete sentence describing what this code does
 
@@ -68,7 +70,23 @@ Provide analysis focusing on:
    - Missing features or best practices (write complete sentences)
    - Code quality improvements needed (write complete sentences)
 
-Write clear, complete sentences without markdown symbols. Be practical and focus on actionable feedback for the repository owner.
+5. ONBOARDING_GUIDE: (This is a critical section)
+   - Provide a step-by-step guide for a new developer to run this project.
+   - List key commands for installation, testing, and running (e.g., `npm install`, `pytest`).
+   - Infer any required environment variables (e.g., `DATABASE_URL`, `API_KEY`).
+   - If setup instructions are in the README, summarize them here.
+
+6. TECH_STACK_RATIONALE: (Provide your best assessment)
+   - Identify the primary framework, language, and package manager.
+   - Infer the likely reason for choosing this stack in one clear sentence.
+   - Mention any interesting or unusual libraries and their purpose.
+
+7. API_ENDPOINT_SUMMARY: (Scan all provided files for this)
+   - List the main API endpoints found (e.g., `GET /api/users`, `POST /api/products`).
+   - Provide a one-sentence guess for what each endpoint does based on the code.
+   - If this is not a web service, you must explicitly state 'Not a web service'.
+
+Write clear, complete sentences without markdown symbols. You must attempt to fill out every section. Be practical and focus on actionable feedback for the repository owner.
 """
 
 def get_comparison_prompt(code: str, language: str = "auto-detect") -> str:

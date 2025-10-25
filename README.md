@@ -1,3 +1,13 @@
+---
+title: AI Code Analyzer
+emoji: 🧠
+colorFrom: black
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # AI Code Analyzer
 
 A professional AI-powered code analysis tool with a sleek Matrix-inspired interface that leverages multiple Large Language Models (LLMs) to provide comprehensive code reviews, identify issues, and suggest improvements.
@@ -9,7 +19,7 @@ A professional AI-powered code analysis tool with a sleek Matrix-inspired interf
 
 ## ✨ Features
 
-* **🤖 Multi-Model Analysis**: Compare insights from OpenAI GPT-4, Anthropic Claude, DeepSeek, and fine-tuned models
+* **🤖 Multi-Model Analysis**: Compare insights from OpenAI GPT-4, Anthropic Claude, DeepSeek, and Hugging Face models
 * **🎯 Fine-tuned Code Analyzer**: Custom DeepSeek model trained on 59+ code analysis examples
 * **🎨 Matrix-Inspired UI**: Sleek dark theme with neon green accents and cyberpunk aesthetics
 * **📊 Comprehensive Code Review**: Get quality scores, identify bugs, security issues, and performance concerns
@@ -22,16 +32,16 @@ A professional AI-powered code analysis tool with a sleek Matrix-inspired interf
 
 ## 🌐 Live Demo
 
-[🚀 Try it live on Render](https://ai-code-analyzer-tcl8.onrender.com)
+**Local Deployment**: Your AI Code Analyzer is running locally at `http://localhost:8501/`
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: Streamlit with custom Matrix-inspired CSS
-- **LLM Integration**: OpenAI, Anthropic, DeepSeek APIs
+- **LLM Integration**: OpenAI, Anthropic, DeepSeek, Hugging Face APIs
 - **Fine-tuning**: LoRA/QLoRA with Hugging Face Transformers
 - **Model Hosting**: Hugging Face Hub & Spaces
 - **Language**: Python 3.11+
-- **Deployment**: Render (configured with render.yaml)
+- **Deployment**: Hugging Face Spaces (recommended for ease of use and free tier)
 - **Styling**: Custom CSS with Google Fonts (Share Tech Mono, Orbitron)
 
 ## 🎯 Fine-tuned Model
@@ -61,6 +71,7 @@ The fine-tuned model provides:
    * OpenAI API Key  
    * Anthropic API Key  
    * DeepSeek API Key
+   * **Hugging Face API Key** (recommended for free usage)
 
 ### Installation
 
@@ -86,14 +97,21 @@ pip install -r requirements.txt
    Create a `.env` file in the root directory:
 ```env
 # API Keys - Replace with your actual API keys
+HUGGINGFACE_API_KEY=your_huggingface_api_key_here  # Recommended for free usage
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 DEEPSEEK_API_KEY=your_deepseek_api_key_here
 GITHUB_TOKEN=your_github_token_here  # Optional, for higher API limits
 ```
 
+**📚 For detailed Hugging Face setup instructions, see: [HUGGINGFACE_SETUP_GUIDE.md](HUGGINGFACE_SETUP_GUIDE.md)**
+
 5. **Run the application:**
 ```bash
+# Option 1: Use the startup script (recommended)
+python run_app.py
+
+# Option 2: Run directly with Streamlit
 python -m streamlit run matrix_final.py --server.port 8501
 ```
 
@@ -122,32 +140,41 @@ The application will be available at `http://localhost:8501`
 
 ## 🏗️ Project Structure
 
+For a detailed explanation of the project structure, architecture, and data flow, please see [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) and [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ```
 ai-code-analyzer/
-├── matrix_final.py        # Main Streamlit application (deployed version)
-├── analyzer/              # Core analysis engine
-│   ├── __init__.py       # Package initialization
-│   ├── code_analyzer.py  # Main analysis engine
-│   ├── llm_clients.py    # LLM API client implementations
-│   ├── prompts.py        # Analysis prompt templates
-│   └── utils.py          # Utility functions
-├── requirements.txt       # Python dependencies
-├── render.yaml           # Render deployment configuration
-├── Procfile             # Alternative deployment configuration
-├── runtime.txt          # Python version specification
-├── README.md            # This file
-└── .env                 # Environment variables (create this)
+├── .venv/                           # Virtual environment directory
+├── analyzer/                          # Core analysis engine
+│   ├── __init__.py                   # Package initialization
+│   ├── code_analyzer.py              # Main analysis engine
+│   ├── llm_clients.py                # LLM API client implementations
+│   ├── prompts.py                    # Analysis prompt templates
+│   └── utils.py                      # Utility functions
+├── tests/                             # Automated tests
+│   ├── test_matrix_final.py          # Tests for matrix_final.py utilities
+│   └── test_prompts.py               # Tests for prompt generation
+├── .env                              # Environment variables (create this)
+├── .gitignore                        # Git ignore file
+├── ARCHITECTURE.md                   # Detailed architecture documentation
+├── matrix_final.py                    # Main Streamlit application
+├── PROJECT_STRUCTURE.md              # High-level project structure
+├── README.md                         # This file
+├── requirements.txt                   # Python dependencies
+├── run_app.py                         # Startup script for easy launching
+└── TESTING_GUIDE.md                  # Guide for testing the application
 ```
 
 ## 🔧 Configuration
 
 ### Supported LLM Providers
 
-| Provider  | Model          | API Key Environment Variable |
-| --------- | -------------- | ---------------------------- |
-| OpenAI    | GPT-4o-mini    | OPENAI\_API\_KEY             |
-| Anthropic | Claude 3 Haiku | ANTHROPIC\_API\_KEY          |
-| DeepSeek  | DeepSeek Chat  | DEEPSEEK\_API\_KEY           |
+| Provider      | Model                    | API Key Environment Variable |
+| ------------- | ------------------------ | ---------------------------- |
+| Hugging Face  | Mixtral-8x7B-Instruct    | HUGGINGFACE\_API\_KEY        |
+| OpenAI        | GPT-4o-mini              | OPENAI\_API\_KEY             |
+| Anthropic     | Claude 3 Haiku           | ANTHROPIC\_API\_KEY          |
+| DeepSeek      | DeepSeek Chat            | DEEPSEEK\_API\_KEY           |
 
 ### Supported Programming Languages
 
@@ -155,22 +182,34 @@ ai-code-analyzer/
 - **Auto-detection** available for most languages
 - **Manual selection** option for specific analysis
 
+## 🧪 Testing
+
+For detailed instructions on how to test the application, please refer to the [TESTING_GUIDE.md](TESTING_GUIDE.md).
+
+To run the automated tests:
+```bash
+pytest
+```
+
 ## 🚀 Deployment
 
-### Deploy to Render (Recommended)
+### Deploy to Hugging Face Spaces (Recommended)
 
-The project is configured for **one-click deployment** on Render:
+This project is configured for easy deployment on **Hugging Face Spaces**:
 
-1. **Fork this repository** to your GitHub account
-2. **Connect to Render**: Go to [Render Dashboard](https://dashboard.render.com)
-3. **Create New Web Service**: Select "Build and deploy from a Git repository"
-4. **Connect Repository**: Link your forked repository
-5. **Configure Environment Variables** in Render dashboard:
-   - `OPENAI_API_KEY`
-   - `ANTHROPIC_API_KEY` 
-   - `DEEPSEEK_API_KEY`
-   - `GITHUB_TOKEN` (optional)
-6. **Deploy**: Render automatically detects `render.yaml` and deploys
+1.  **Fork this repository** to your GitHub account.
+2.  **Create a new Space**: Go to [Hugging Face Spaces](https://huggingface.co/spaces/new) and create a new Space.
+    *   Choose "Streamlit" as the Space SDK.
+    *   Select "Public" or "Private" as per your preference.
+    *   Connect your forked GitHub repository.
+3.  **Configure Secrets**: In your Hugging Face Space settings, go to "App settings" -> "Secrets". Add your API keys:
+    *   `HUGGINGFACE_API_KEY` (required for Hugging Face models)
+    *   `OPENAI_API_KEY` (optional)
+    *   `ANTHROPIC_API_KEY` (optional)
+    *   `DEEPSEEK_API_KEY` (optional)
+    *   `GITHUB_TOKEN` (optional, for higher GitHub API limits)
+4.  **Wait for Deployment**: Hugging Face will automatically detect your `requirements.txt` and `matrix_final.py` and deploy your app.
+5.  **Access Your App**: Once deployed, your application will be live on your Hugging Face Space URL.
 
 ### Manual Deployment
 
@@ -203,10 +242,13 @@ The tool provides structured analysis including:
 
 ### Running Locally
 ```bash
-# Start the development server
+# Option 1: Use the startup script (recommended)
+python run_app.py
+
+# Option 2: Start the development server directly
 python -m streamlit run matrix_final.py --server.port 8501
 
-# With auto-reload for development
+# Option 3: With auto-reload for development
 python -m streamlit run matrix_final.py --server.port 8501 --server.runOnSave true
 ```
 
@@ -247,9 +289,9 @@ If you encounter any issues or have questions:
 
 ## 🔗 Links
 
-- **Live Demo**: [ai-code-analyzer-tcl8.onrender.com](https://ai-code-analyzer-tcl8.onrender.com)
+- **Live Demo**: *Your Hugging Face Space URL here*
 - **Repository**: [github.com/arun3676/ai-code-analyzer](https://github.com/arun3676/ai-code-analyzer)
-- **Render Dashboard**: [dashboard.render.com](https://dashboard.render.com)
+- **Hugging Face Spaces**: [huggingface.co/spaces](https://huggingface.co/spaces)
 
 ---
 
