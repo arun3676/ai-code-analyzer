@@ -500,7 +500,10 @@ st.markdown(
 
 @st.cache_resource
 def get_analyzer():
-    return CodeAnalyzer(cache_dir=".analyzer_cache")
+    # Use /tmp for cache in Docker/HF Spaces (always writable)
+    # Use .analyzer_cache for local development
+    cache_dir = "/tmp/.analyzer_cache" if os.path.exists("/app") else ".analyzer_cache"
+    return CodeAnalyzer(cache_dir=cache_dir)
 
 
 analyzer = get_analyzer()
